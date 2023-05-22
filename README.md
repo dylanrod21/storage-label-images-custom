@@ -1,3 +1,8 @@
+
+# Label Images with ~~Cloud Vision AI~~ Custon AI Solution
+Cloud Function that is triggered when images are placed in a specific cloud folder, the function sends the images to the Google Vision API which returns labels for the images which the function then adds to firestore. I plan to tweak the data params added to the firestore document as well as use a custom model to get more fine grained labels, for that I may need to write a python cloud function with its new support since python may be more capable and easy to find examples for but tensorflow js is probably not a bad option
+
+
 # Label Images with Cloud Vision AI
 
 **Author**: Google Cloud (**[https://cloud.google.com/](https://cloud.google.com/)**)
