@@ -58,15 +58,38 @@ export const shouldLabelImage = (
   return true;
 };
 
-const FEATURE_TYPE = 'LABEL_DETECTION';
+ const FEATURE_TYPE = 'LABEL_DETECTION';
 
 export const getVisionRequest = (imageBase64: string): ImprovedRequest => ({
   image: {
     content: imageBase64,
   },
+  imageContext: {
+    webDetectionParams: {
+      includeGeoResults: true,
+    },
+  },
   features: [
     {
       type: FEATURE_TYPE,
+    },
+    {
+      type: 'WEB_DETECTION',
+    },
+    {
+      type: 'TEXT_DETECTION'
+    },
+    {
+      type: 'LOGO_DETECTION'
+    },
+    {
+      type: 'IMAGE_PROPERTIES'
+    },
+    {
+      type: 'LANDMARK_DETECTION'
+    },
+    {
+      type: 'OBJECT_LOCALIZATION'
     },
   ],
 });

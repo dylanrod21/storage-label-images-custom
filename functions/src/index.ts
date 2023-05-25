@@ -54,6 +54,19 @@ export const labelImageCustom = functions.storage
     logs.labelingComplete(object.name!);
 
     let labelAnnotations = results.labelAnnotations;
+    let webDetection = results.webDetection;
+    let imagePropertiesAnnotation = results.imagePropertiesAnnotation;  
+    let fullTextAnnotation = results.fullTextAnnotation;  
+    let webEntities = results.webEntities;  
+    let localizedObjectAnnotations = results.localizedObjectAnnotations;
+    let logoAnnotations = results.logoAnnotations;  
+    let textAnnotations = results.textAnnotations;  
+    let faceAnnotations = results.faceAnnotations;  
+    let landmarkAnnotations = results.landmarkAnnotations;
+    let objectAnnotations = results.objectAnnotations;  
+    let error = results.error;  
+    let context = results.context;  
+
 
     if (!labelAnnotations) {
       logs.noLabels(object.name!);
@@ -68,6 +81,7 @@ export const labelImageCustom = functions.storage
     const data = {
       file: filePath,
       labels: formatLabels(labelAnnotations),
+      
       url: `https://storage.googleapis.com/${object.bucket}/${object.name}`,
     };
 
