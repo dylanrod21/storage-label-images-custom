@@ -19,7 +19,7 @@ import * as admin from 'firebase-admin';
 import * as vision from '@google-cloud/vision'
 import * as logs from './logs';
 import config from './config';
-import {formatLabels, getVisionRequest, shouldLabelImage} from './util';
+import {formatLabels, getTopColors, getVisionRequest, shouldLabelImage} from './util';
 import {IAnnotatedImageResponse} from './types';
 
 admin.initializeApp();
@@ -53,20 +53,13 @@ export const labelImageCustom = functions.storage
     }
     logs.labelingComplete(object.name!);
 
-    let labelAnnotations = results.labelAnnotations;
     let webDetection = results.webDetection;
-    let imagePropertiesAnnotation = results.imagePropertiesAnnotation;  
-    let fullTextAnnotation = results.fullTextAnnotation;  
-    let webEntities = results.webEntities;  
-    let localizedObjectAnnotations = results.localizedObjectAnnotations;
     let logoAnnotations = results.logoAnnotations;  
-    let textAnnotations = results.textAnnotations;  
-    let faceAnnotations = results.faceAnnotations;  
     let landmarkAnnotations = results.landmarkAnnotations;
-    let objectAnnotations = results.objectAnnotations;  
-    let error = results.error;  
-    let context = results.context;  
-
+    let labelAnnotations = results.labelAnnotations;
+    let fullTextAnnotation = results.fullTextAnnotation; 
+    let imagePropertiesAnnotation = results.imagePropertiesAnnotation;  
+    let localizedObjectAnnotations = results.localizedObjectAnnotations;
 
     if (!labelAnnotations) {
       logs.noLabels(object.name!);
@@ -79,9 +72,19 @@ export const labelImageCustom = functions.storage
     const filePath = `gs://${object.bucket}/${object.name}`;
 
     const data = {
+      // text: textAnnotations,
+      // imageProperties: imagePropertiesAnnotation,
       file: filePath,
-      labels: formatLabels(labelAnnotations),
-      
+      name: object.name,
+      logos: logoAnnotations,   
+      dateTimestamp: Date.now() / 1000 | 0,         
+      web: webDetection?.webEntities || null,
+      landmarks: landmarkAnnotations || null,      
+      fullText: fullTextAnnotation?.text || null,      
+      location: object.metadata?.location || null, //this is only present when uploading from the app
+      labels: formatLabels(labelAnnotations),      
+      localizedObjects: localizedObjectAnnotations,
+      dominantColors: getTopColors(imagePropertiesAnnotation),
       url: `https://storage.googleapis.com/${object.bucket}/${object.name}`,
     };
 
