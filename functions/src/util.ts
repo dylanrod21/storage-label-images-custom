@@ -58,41 +58,60 @@ export const shouldLabelImage = (
   return true;
 };
 
- const FEATURE_TYPE = 'LABEL_DETECTION';
+//function to get the top colors from the imageProperties
+export function getTopColors(imagePropertiesAnnotation: any) {
+  let colors = [];
+  let colorCount = 0;
+  let colorCountMax = 3;
 
-export const getVisionRequest = (imageBase64: string): ImprovedRequest => ({
-  image: {
-    content: imageBase64,
-  },
-  imageContext: {
-    webDetectionParams: {
-      includeGeoResults: true,
-    },
-  },
-  features: [
-    {
-      type: FEATURE_TYPE,
-    },
-    {
-      type: 'WEB_DETECTION',
-    },
-    {
-      type: 'TEXT_DETECTION'
-    },
-    {
-      type: 'LOGO_DETECTION'
-    },
-    {
-      type: 'IMAGE_PROPERTIES'
-    },
-    {
-      type: 'LANDMARK_DETECTION'
-    },
-    {
-      type: 'OBJECT_LOCALIZATION'
-    },
-  ],
-});
+  if (imagePropertiesAnnotation.dominantColors.colors) {
+    for (const color of imagePropertiesAnnotation.dominantColors.colors) {
+      if (colorCount < colorCountMax) {
+        colors.push(
+          rgbToColorName(color.color.red, color.color.green, color.color.blue)
+        );
+      }
+      colorCount++;
+    }
+  }
+  return colors;
+}
+
+export function rgbToColorName(r: number, g: number, b: number) {
+  let names = [
+    'Black',
+    'White',
+    'Red',
+    'Lime',
+    'Blue',
+    'Yellow',
+    'Cyan',
+    'Magenta',
+    'Silver',
+    'Gray',
+    'Maroon',
+    'Olive',
+    'Green',
+    'Purple',
+    'Teal',
+    'Navy',
+  ];
+  let color = '#';
+  let rgb = [r, g, b];
+  for (let i = 0; i < 3; i++) {
+    let hex = Number(rgb[i]).toString(16);
+    if (hex.length < 2) {
+      hex = '0' + hex;
+    }
+    color += hex;
+  }
+  let index = names.indexOf(color);
+  if (index == -1) {
+    return color;
+  } else {
+    return names[index];
+  }
+}
 
 export function formatLabels(labelAnnotations: IEntityAnnotation[]) {
   const labels = [];
@@ -108,3 +127,37 @@ export function formatLabels(labelAnnotations: IEntityAnnotation[]) {
   }
   return labels;
 }
+
+export const getVisionRequest = (imageBase64: string): ImprovedRequest => ({
+  image: {
+    content: imageBase64,
+  },
+  imageContext: {
+    webDetectionParams: {
+      includeGeoResults: true,
+    },
+  },
+  features: [
+    {
+      type: 'WEB_DETECTION',
+    },
+    {
+      type: 'TEXT_DETECTION'
+    },
+    {
+      type: 'LOGO_DETECTION'
+    },
+    {
+      type: 'LABEL_DETECTION',
+    },
+    {
+      type: 'IMAGE_PROPERTIES'
+    },
+    {
+      type: 'LANDMARK_DETECTION'
+    },
+    {
+      type: 'OBJECT_LOCALIZATION'
+    },
+  ],
+});
