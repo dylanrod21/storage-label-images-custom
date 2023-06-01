@@ -1,8 +1,10 @@
-import * as path from 'path';
-import * as functions from 'firebase-functions';
-import config from './config';
-import * as logs from './logs';
 import {IEntityAnnotation, ImprovedRequest} from './types';
+import * as functions from 'firebase-functions';
+import ColorNamer from "color-namer";
+import * as logs from './logs';
+import config from './config';
+import * as path from 'path';
+import Jimp from "jimp";
 
 export const startsWithArray = (
   userInputPaths: string[],
@@ -57,6 +59,30 @@ export const shouldLabelImage = (
   }
   return true;
 };
+
+export function cropImage(imgUri: string, width = 640, height = 640, xstart=0, ystart=0) {
+  console.log("Cropping image: " + imgUri);
+  console.log("PARAMS -->" + width + " " + height + " " + xstart + " " + ystart);
+  Jimp.read(imgUri)
+  .then((croppedImg) => {
+    return croppedImg.crop(xstart, ystart, width, height) // crop the image
+  })
+  .catch((err) => {
+    console.error(err);
+  });
+}
+
+//function to get the top color from the imageProperties and convert to single simple color name
+export function getTopColorName(imagePropertiesAnnotation: any) {
+  let red =  imagePropertiesAnnotation.dominantColors.colors[0].color.red;
+  let green =  imagePropertiesAnnotation.dominantColors.colors[0].color.green;
+  let blue = imagePropertiesAnnotation.dominantColors.colors[0].color.blue;
+  return rgbToSimpleColorName(red, green, blue);
+}
+
+export function rgbToSimpleColorName(r: number, g: number, b: number) {
+  return ColorNamer( `rgb(${r},${g},${b})` , { pick: ['basic'] } ).basic[0].name;
+}
 
 //function to get the top colors from the imageProperties
 export function getTopColors(imagePropertiesAnnotation: any) {
@@ -141,23 +167,35 @@ export const getVisionRequest = (imageBase64: string): ImprovedRequest => ({
     {
       type: 'WEB_DETECTION',
     },
-    {
-      type: 'TEXT_DETECTION'
-    },
-    {
-      type: 'LOGO_DETECTION'
-    },
-    {
-      type: 'LABEL_DETECTION',
-    },
-    {
-      type: 'IMAGE_PROPERTIES'
-    },
-    {
-      type: 'LANDMARK_DETECTION'
-    },
+    // {
+    //   type: 'TEXT_DETECTION'
+    // },
+    // {
+    //   type: 'LOGO_DETECTION'
+    // },
+    // {
+    //   type: 'LABEL_DETECTION',
+    // },
+    // {
+    //   type: 'IMAGE_PROPERTIES'
+    // },
+    // {
+    //   type: 'LANDMARK_DETECTION'
+    // },
     {
       type: 'OBJECT_LOCALIZATION'
     },
+  ],
+});
+
+// send all cropped images using extract operation from Image Processing API 
+export const getImgPropertiesVisionRequest = (imageBase64: string): ImprovedRequest => ({
+  image: {
+    content: imageBase64,
+  },
+  features: [
+    {
+      type: 'IMAGE_PROPERTIES'
+    }
   ],
 });

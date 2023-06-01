@@ -58,6 +58,18 @@ export const labelingError = (imagePath: string, error: unknown) => {
   logger.error(`Labeling failed for image: ${imagePath}`, error);
 };
 
+export const labelingCroppedImage = (imagePath: string) => {
+  logger.log(`Labeling Cropped image: ${imagePath}`);
+};
+
+export const labelingCroppedImageComplete = (imagePath: string) => {
+  logger.log(`Labeling complete for Cropped image: ${imagePath}`);
+};
+
+export const labelingCroppedImageError = (imagePath: string, error: unknown) => {
+  logger.error(`Labeling failed for Cropped image: ${imagePath}`, error);
+};
+
 export const writingToFirestore = (imagePath: string) => {
   logger.log(`Writing labels to Firestore for image: ${imagePath}`);
 };
