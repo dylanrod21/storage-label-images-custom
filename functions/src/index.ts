@@ -19,7 +19,7 @@ import * as admin from 'firebase-admin';
 import * as vision from '@google-cloud/vision'
 import * as logs from './logs';
 import config from './config';
-import {cropImage, getImgPropertiesVisionRequest, getTopColorName, getVisionRequest, shouldLabelImage} from './util';
+import {cropImage, formatLabels, getImgPropertiesVisionRequest, getTopColorName, getVisionRequest, shouldLabelImage} from './util';
 import {IAnnotatedImageResponse} from './types';
 
 admin.initializeApp();
@@ -51,17 +51,18 @@ export const labelImageCustom = functions.storage
     }
     logs.labelingComplete(object.name!);
 
-    let webDetection = results.webDetection;
     // let logoAnnotations = results.logoAnnotations;  
     // let landmarkAnnotations = results.landmarkAnnotations;
-    // let labelAnnotations = results.labelAnnotations;
     // let fullTextAnnotation = results.fullTextAnnotation; 
+
+    let webDetection = results.webDetection;
+    let labelAnnotations = results.labelAnnotations;
     let localizedObjectAnnotations = results.localizedObjectAnnotations;
 
-    // if (!labelAnnotations) {
-    //   logs.noLabels(object.name!);
-    //   labelAnnotations = [];
-    // }
+    if (!labelAnnotations) {
+      logs.noLabels(object.name!);
+      labelAnnotations = [];
+    }
 
     let objectsWithColors = [];
     // let croppedBase64Image = imageBase64; // base64 image string to be cropped
@@ -108,13 +109,13 @@ export const labelImageCustom = functions.storage
       // imageProperties: imagePropertiesAnnotation,      
       // dominantColors: getTopColors(imagePropertiesAnnotation),
       // logos: logoAnnotations,   
-      // labels: formatLabels(labelAnnotations),      
       // landmarks: landmarkAnnotations || null,      
       // fullText: fullTextAnnotation?.text || null,      
 
       file: filePath,
       name: object.name,
       dateTimestamp: Date.now() / 1000 | 0,         
+      labels: formatLabels(labelAnnotations),
       web: webDetection?.webEntities || null,
       location: object.metadata?.location || null, //this is only present when uploading from the app
       localizedObjects: localizedObjectAnnotations,

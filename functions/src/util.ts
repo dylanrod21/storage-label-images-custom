@@ -164,9 +164,9 @@ export const getVisionRequest = (imageBase64: string): ImprovedRequest => ({
     },
   },
   features: [
-    {
-      type: 'WEB_DETECTION',
-    },
+    // {
+    //   type: 'WEB_DETECTION',
+    // },
     // {
     //   type: 'TEXT_DETECTION'
     // },
@@ -174,14 +174,14 @@ export const getVisionRequest = (imageBase64: string): ImprovedRequest => ({
     //   type: 'LOGO_DETECTION'
     // },
     // {
-    //   type: 'LABEL_DETECTION',
-    // },
-    // {
     //   type: 'IMAGE_PROPERTIES'
     // },
     // {
     //   type: 'LANDMARK_DETECTION'
     // },
+    {
+      type: 'LABEL_DETECTION'
+    },
     {
       type: 'OBJECT_LOCALIZATION'
     },
